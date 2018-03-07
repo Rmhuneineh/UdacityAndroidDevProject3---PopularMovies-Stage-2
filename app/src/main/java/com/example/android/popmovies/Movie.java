@@ -1,51 +1,33 @@
 package com.example.android.popmovies;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import android.util.Log;
 
 /**
  * Created by rmhuneineh on 07/03/2018.
  */
 
-public class Movie implements Parcelable {
+public class Movie {
+
+    private static final String LOG_TAG = "Movie";
 
     String mTitle;
     String mReleaseDate;
     String mPosterPath;
     double mVoteAverage;
-    String mPlotSynopsis;
+    String mOverview;
     String mBackdropPath;
 
     public Movie(String title, String releaseDate, String posterPath, double voteAverage,
-                 String plotSynopsis, String backdropPath) {
+                 String overview, String backdropPath) {
         mTitle = title;
         mReleaseDate = releaseDate;
         mPosterPath = posterPath;
         mVoteAverage = voteAverage;
-        mPlotSynopsis = plotSynopsis;
+        mOverview = overview;
         mBackdropPath = backdropPath;
+
+        Log.v(LOG_TAG, mTitle + "\n" + mReleaseDate + "\n" + mVoteAverage + "\n" + mOverview);
     }
-
-    protected Movie(Parcel in) {
-        mTitle = in.readString();
-        mReleaseDate = in.readString();
-        mPosterPath = in.readString();
-        mVoteAverage = in.readFloat();
-        mPlotSynopsis = in.readString();
-        mBackdropPath = in.readString();
-    }
-
-    public static final Creator<Movie> CREATOR = new Creator<Movie>() {
-        @Override
-        public Movie createFromParcel(Parcel in) {
-            return new Movie(in);
-        }
-
-        @Override
-        public Movie[] newArray(int size) {
-            return new Movie[size];
-        }
-    };
 
     // Getters
     public String getTitle() {
@@ -64,8 +46,8 @@ public class Movie implements Parcelable {
         return mVoteAverage;
     }
 
-    public String getPlotSynopsis() {
-        return mPlotSynopsis;
+    public String getOverview() {
+        return mOverview;
     }
 
     public String getBackdropPath() {
@@ -89,27 +71,11 @@ public class Movie implements Parcelable {
         mVoteAverage = voteAverage;
     }
 
-    public void setPlotSynopsis(String plotSynopsis) {
-        mPlotSynopsis = plotSynopsis;
+    public void setOverview(String plotSynopsis) {
+        mOverview = plotSynopsis;
     }
 
     public void setBackdropPath(String backdropPath) {
         mBackdropPath = backdropPath;
-    }
-
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(mTitle);
-        parcel.writeString(mReleaseDate);
-        parcel.writeString(mPosterPath);
-        parcel.writeString(mBackdropPath);
-        parcel.writeDouble(mVoteAverage);
-        parcel.writeString(mPlotSynopsis);
     }
 }

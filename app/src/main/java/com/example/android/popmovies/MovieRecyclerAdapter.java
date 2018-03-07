@@ -1,5 +1,7 @@
 package com.example.android.popmovies;
 
+import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +17,20 @@ import java.util.List;
  */
 
 public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdapter.ViewHolder> {
+
+    private static final String LOG_TAG = "MovieRecyclerAdapter";
+
+    private static final String intent_key = "movie_extra";
+
+    private static final String TITLE_KEY = "title_key";
+    private static final String RELEASE_DATE_KEY = "realease_date_key";
+    private static final String VOTE_AVERAGE_KEY = "vote_average_key";
+    private static final String OVERVIEW_KEY = "overview_key";
+    private static final String BACKDROP_PATH_KEY = "backdrop_path_key";
+
+
+
+
 
     List<Movie> mMovies;
     MainActivity mContext;
@@ -37,15 +53,6 @@ public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdap
                 .load(R.string.poster_base_path + posterPath)
                 .placeholder(R.drawable.fight_club_poster)
                 .into(holder.poster);
-
-        /*holder.poster.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent  = new Intent(mContext, DetailsActivity.class);
-                intent.putExtra(Integer.toString(R.string.intent_key), currentMovie);
-                mContext.startActivity(intent);
-            }
-        });*/
     }
 
     @Override
@@ -53,12 +60,28 @@ public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdap
         return mMovies.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public  class ViewHolder extends RecyclerView.ViewHolder {
         protected ImageView poster;
 
         public ViewHolder(View itemView) {
             super(itemView);
             poster = itemView.findViewById(R.id.poster_image);
+
+            poster.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(view.getContext(), DetailsActivity.class);
+                    Movie chosenMovie = mMovies.get(getAdapterPosition());
+                    Bundle bundle = new Bundle();
+                    bundle.putString(TITLE_KEY, chosenMovie.getTitle());
+                    bundle.putString(RELEASE_DATE_KEY, chosenMovie.getReleaseDate());
+                    bundle.putDouble(VOTE_AVERAGE_KEY, chosenMovie.getVoteAverage());
+                    bundle.putString(OVERVIEW_KEY, chosenMovie.getOverview());
+                    bundle.putString(BACKDROP_PATH_KEY, chosenMovie.getBackdropPath());
+                    intent.putExtras(bundle);
+                    mContext.startActivity(intent);
+                }
+            });
         }
     }
 

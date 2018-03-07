@@ -74,12 +74,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setMovies() {
-        Movie movie = new Movie(String.valueOf(R.string.title_example),
-                String.valueOf(R.string.release_date_example),
+        Movie movie = new Movie(getResources().getString(R.string.title_example),
+                getResources().getString(R.string.release_date_example),
                 "/adw6Lq9FiC9zjYEpOqfq03ituwp.jpg", 8.4,
-                String.valueOf(R.string.overview_example),
+                getResources().getString(R.string.overview_example),
                 "/mMZRKb3NVo5ZeSPEIaNW9buLWQ0.jpg");
-        for(int i=0; i<20; i++) {
+        for(int i=0; i<2; i++) {
             mMoviesList.add(movie);
         }
     }
