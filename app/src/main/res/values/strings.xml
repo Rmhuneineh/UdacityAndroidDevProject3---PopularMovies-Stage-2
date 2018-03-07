@@ -1,3 +1,31 @@
 <resources>
     <string name="app_name">PopMovies</string>
+
+    <!-- Main -->
+    <string name="error_message">Please Check Your Internet</string>
+    <string name="poster_base_path">https://image.tmdb.org/t/p/w185</string>
+    <string name="intent_key">movie_extra</string>
+
+    <!-- Detail -->
+    <string name="title">Title</string>
+    <string name="title_example">Fight Club</string>
+    <string name="release_date">Release Date</string>
+    <string name="release_date_example">1999-10-15</string>
+    <string name="ten">/10</string>
+    <string name="rating">Rating</string>
+    <string name="rating_example">8.3</string>
+    <string name="overview">Overview</string>
+    <string name="overview_example">A ticking-time-bomb insomniac and a slippery soap salesman
+        channel primal male aggression into a shocking new form of therapy. Their concept catches
+        on, with underground \"fight clubs\" forming in every town, until an eccentric gets in the
+        way and ignites an out-of-control spiral toward oblivion.</string>
+
+    <!-- Settings -->
+    <string name="default_value">popular</string>
+    <string name="key">sort_by</string>
+    <string name="key_label">Sort By</string>
+    <string name="settings_label">Settings</string>
+
+    <!-- APIKEY -->
+    <string name="api_key">1b8d584a2753ce32f45181eb98e06bc9</string>
 </resources>
