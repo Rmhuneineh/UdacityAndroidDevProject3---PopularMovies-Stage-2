@@ -14,6 +14,8 @@ import butterknife.ButterKnife;
 public class DetailsActivity extends AppCompatActivity {
     private static final String LOG_TAG = "DetailsActivity";
 
+    private static final String base_path = "https://image.tmdb.org/t/p/w342";
+
     private static final String TITLE_KEY = "title_key";
     private static final String RELEASE_DATE_KEY = "realease_date_key";
     private static final String VOTE_AVERAGE_KEY = "vote_average_key";
@@ -51,7 +53,7 @@ public class DetailsActivity extends AppCompatActivity {
 
     public void setUI(Bundle bundle) {
         Picasso.with(this)
-                .load(R.string.poster_base_path + bundle.getString(BACKDROP_PATH_KEY))
+                .load(base_path + bundle.getString(BACKDROP_PATH_KEY))
                 .placeholder(R.drawable.fight_club_backdrop)
                 .into(backdropIV);
 

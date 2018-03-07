@@ -20,7 +20,7 @@ public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdap
 
     private static final String LOG_TAG = "MovieRecyclerAdapter";
 
-    private static final String intent_key = "movie_extra";
+    private static final String base_path = "https://image.tmdb.org/t/p/w342";
 
     private static final String TITLE_KEY = "title_key";
     private static final String RELEASE_DATE_KEY = "realease_date_key";
@@ -50,7 +50,7 @@ public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdap
         String posterPath = currentMovie.getPosterPath();
 
         Picasso.with(mContext)
-                .load(R.string.poster_base_path + posterPath)
+                .load(base_path + posterPath)
                 .placeholder(R.drawable.fight_club_poster)
                 .into(holder.poster);
     }
