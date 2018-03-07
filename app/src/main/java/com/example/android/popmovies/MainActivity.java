@@ -15,6 +15,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.progress_bar)
     ProgressBar mProgressBar;
 
-    ArrayList<Movie> mMoviesList;
+    ArrayList<Movie> mMoviesList = new ArrayList<Movie>();
     MovieRecyclerAdapter mRecyclerAdapter;
 
     @Override
@@ -39,15 +40,18 @@ public class MainActivity extends AppCompatActivity {
 
         Log.v(LOG_TAG, "OnCreate Called!");
 
+        ButterKnife.bind(this);
+
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
         mRecyclerView.setLayoutManager(gridLayoutManager);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerAdapter = new MovieRecyclerAdapter(this, mMoviesList);
         mRecyclerView.setAdapter(mRecyclerAdapter);
+        setMovies();
 
         if(hasConnection()) {
-            mRecyclerView.setVisibility(View.GONE);
-            mProgressBar.setVisibility(View.VISIBLE);
+            mRecyclerView.setVisibility(View.VISIBLE);
+            mProgressBar.setVisibility(View.GONE);
             mErrorTV.setVisibility(View.GONE);
         } else {
             mRecyclerView.setVisibility(View.GONE);
@@ -66,5 +70,16 @@ public class MainActivity extends AppCompatActivity {
                 activeNetwork.isConnectedOrConnecting();
 
         return isConnected;
+    }
+
+    private void setMovies() {
+        Movie movie = new Movie(String.valueOf(R.string.title_example),
+                String.valueOf(R.string.release_date_example),
+                "/adw6Lq9FiC9zjYEpOqfq03ituwp.jpg", 8.4,
+                String.valueOf(R.string.overview_example),
+                "/mMZRKb3NVo5ZeSPEIaNW9buLWQ0.jpg");
+        for(int i=0; i<20; i++) {
+            mMoviesList.add(movie);
+        }
     }
 }
