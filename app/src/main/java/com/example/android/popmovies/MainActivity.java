@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this,
-                R.integer.column_number);
+                getResources().getInteger(R.integer.column_number));
         mRecyclerView.setLayoutManager(gridLayoutManager);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerAdapter = new MovieRecyclerAdapter(this, mMoviesList);
