@@ -1,6 +1,5 @@
 package com.example.android.popmovies;
 
-import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,14 +38,14 @@ public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdap
                 .placeholder(R.drawable.fight_club_poster)
                 .into(holder.poster);
 
-        holder.poster.setOnClickListener(new View.OnClickListener() {
+        /*holder.poster.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent  = new Intent(mContext, DetailsActivity.class);
                 intent.putExtra(Integer.toString(R.string.intent_key), currentMovie);
                 mContext.startActivity(intent);
             }
-        });
+        });*/
     }
 
     @Override
