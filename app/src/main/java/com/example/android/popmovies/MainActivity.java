@@ -3,6 +3,7 @@ package com.example.android.popmovies;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -12,7 +13,9 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -48,18 +51,60 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setHasFixedSize(true);
         mRecyclerAdapter = new MovieRecyclerAdapter(this, mMoviesList);
         mRecyclerView.setAdapter(mRecyclerAdapter);
-        setMovies();
 
         if(hasConnection()) {
-            mRecyclerView.setVisibility(View.VISIBLE);
-            mProgressBar.setVisibility(View.GONE);
+            mRecyclerView.setVisibility(View.GONE);
+            mProgressBar.setVisibility(View.VISIBLE);
             mErrorTV.setVisibility(View.GONE);
+
+            String sortOrder = getResources().getString(R.string.default_value);
+
+            FetchMovieTask movieTask = new FetchMovieTask();
+            movieTask.execute(sortOrder);
         } else {
             mRecyclerView.setVisibility(View.GONE);
             mProgressBar.setVisibility(View.GONE);
             mErrorTV.setText(R.string.error_message);
             mErrorTV.setVisibility(View.VISIBLE);
         }
+    }
+
+    public class FetchMovieTask extends AsyncTask<String, Void, List<Movie>> {
+
+        @Override
+        protected List<Movie> doInBackground(String... urls) {
+            Log.v(LOG_TAG, "doInBackground Called!");
+            if (urls.length < 1 || urls[0] == null) {
+                return null;
+            }
+
+            String sortOrder = urls[0];
+            URL requestUrl = NetworkUtils.buildUrl(sortOrder);
+            try {
+
+                List<Movie> movieList = NetworkUtils.fetchMovies(requestUrl);
+                mRecyclerAdapter.setMovies(movieList);
+                return movieList;
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(List<Movie> movies) {
+            Log.v(LOG_TAG, "onPostExecute Called!");
+            super.onPostExecute(movies);
+
+            mProgressBar.setVisibility(View.INVISIBLE);
+            mRecyclerAdapter = new MovieRecyclerAdapter(MainActivity.this, movies);
+            mRecyclerView.setAdapter(mRecyclerAdapter);
+            mRecyclerView.setVisibility(View.VISIBLE);
+
+
+        }
+
     }
 
     private Boolean hasConnection() {
@@ -71,16 +116,5 @@ public class MainActivity extends AppCompatActivity {
                 activeNetwork.isConnectedOrConnecting();
 
         return isConnected;
-    }
-
-    private void setMovies() {
-        Movie movie = new Movie(getResources().getString(R.string.title_example),
-                getResources().getString(R.string.release_date_example),
-                "/adw6Lq9FiC9zjYEpOqfq03ituwp.jpg", 8.4,
-                getResources().getString(R.string.overview_example),
-                "/mMZRKb3NVo5ZeSPEIaNW9buLWQ0.jpg");
-        for(int i=0; i<2; i++) {
-            mMoviesList.add(movie);
-        }
     }
 }
