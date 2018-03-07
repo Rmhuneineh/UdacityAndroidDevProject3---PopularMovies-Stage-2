@@ -1,14 +1,19 @@
 package com.example.android.popmovies;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -57,7 +62,12 @@ public class MainActivity extends AppCompatActivity {
             mProgressBar.setVisibility(View.VISIBLE);
             mErrorTV.setVisibility(View.GONE);
 
-            String sortOrder = getResources().getString(R.string.default_value);
+            SharedPreferences sharedPreferences = PreferenceManager
+                    .getDefaultSharedPreferences(this);
+
+            String sortOrderKey = getString(R.string.key);
+            String sortOrderDefault = getString(R.string.default_value);
+            String sortOrder = sharedPreferences.getString(sortOrderKey, sortOrderDefault);
 
             FetchMovieTask movieTask = new FetchMovieTask();
             movieTask.execute(sortOrder);
@@ -67,6 +77,31 @@ public class MainActivity extends AppCompatActivity {
             mErrorTV.setText(R.string.error_message);
             mErrorTV.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        Log.v(LOG_TAG, "onCreateOptionsMenu Called!");
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Log.v(LOG_TAG, "onOptionsItemSelected Called!");
+        int id = item.getItemId();
+
+        switch(id){
+            case R.id.action_settings:
+                Intent settingsIntent = new Intent(this, SettingsActivity.class);
+                startActivity(settingsIntent);
+                return true;
+
+            default:
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     public class FetchMovieTask extends AsyncTask<String, Void, List<Movie>> {
