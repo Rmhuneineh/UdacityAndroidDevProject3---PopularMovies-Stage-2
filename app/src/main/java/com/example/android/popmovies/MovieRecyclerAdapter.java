@@ -22,11 +22,14 @@ public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdap
 
     private static final String base_path = "https://image.tmdb.org/t/p/w342";
 
+    private static final String ID_KEY = "id_key";
     private static final String TITLE_KEY = "title_key";
     private static final String RELEASE_DATE_KEY = "realease_date_key";
+    private static final String POSTER_KEY = "poster_key";
     private static final String VOTE_AVERAGE_KEY = "vote_average_key";
     private static final String OVERVIEW_KEY = "overview_key";
     private static final String BACKDROP_PATH_KEY = "backdrop_path_key";
+    private static final String YOUTUBE_KEY_KEY = "youtube_key";
 
 
 
@@ -73,8 +76,10 @@ public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdap
                     Intent intent = new Intent(view.getContext(), DetailsActivity.class);
                     Movie chosenMovie = mMovies.get(getAdapterPosition());
                     Bundle bundle = new Bundle();
+                    bundle.putString(ID_KEY, chosenMovie.getId());
                     bundle.putString(TITLE_KEY, chosenMovie.getTitle());
                     bundle.putString(RELEASE_DATE_KEY, chosenMovie.getReleaseDate());
+                    bundle.putString(POSTER_KEY, chosenMovie.getPosterPath());
                     bundle.putDouble(VOTE_AVERAGE_KEY, chosenMovie.getVoteAverage());
                     bundle.putString(OVERVIEW_KEY, chosenMovie.getOverview());
                     bundle.putString(BACKDROP_PATH_KEY, chosenMovie.getBackdropPath());

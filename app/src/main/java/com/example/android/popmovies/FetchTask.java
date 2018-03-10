@@ -14,12 +14,19 @@ import java.util.List;
 public class FetchTask extends AsyncTask<String, Void, List<Movie>> {
     private static final String LOG_TAG = "FetchTask";
 
-    private MainActivity mContext;
-    private MovieRecyclerAdapter mRecyclerAdapter;
+    private MainActivity mContext = null;
+    private MovieRecyclerAdapter mRecyclerAdapter = null;
+    private String mId;
+    private Movie mCurrentMovie;
 
     public FetchTask(MainActivity context, MovieRecyclerAdapter recyclerAdapter) {
         mContext = context;
         mRecyclerAdapter = recyclerAdapter;
+    }
+
+    public FetchTask(Movie currentMovie) {
+        mId = currentMovie.getId();
+        mCurrentMovie = currentMovie;
     }
 
     @Override
@@ -29,16 +36,35 @@ public class FetchTask extends AsyncTask<String, Void, List<Movie>> {
             return null;
         }
 
-        String sortOrder = urls[0];
-        URL requestUrl = NetworkUtils.buildUrl(sortOrder);
-        try {
+        if(urls.length == 1) {
+            String sortOrder = urls[0];
+            URL requestUrl = NetworkUtils.buildUrl(sortOrder);
+            try {
 
-            List<Movie> movieList = NetworkUtils.fetchMovies(requestUrl);
-            mRecyclerAdapter.setMovies(movieList);
-            return movieList;
+                List<Movie> movieList = NetworkUtils.fetchMovies(requestUrl);
+                mRecyclerAdapter.setMovies(movieList);
+                return movieList;
 
-        } catch (Exception e) {
-            e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        } else {
+            URL videosUrl = NetworkUtils.buildVideosUrl(mId);
+                try {
+                    String youtubeKey = NetworkUtils.fetchVideos(videosUrl);
+                    mCurrentMovie.setYoutubeKey(youtubeKey);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+            }
+
+            URL reviewsUrl = NetworkUtils.buildReviewsUrl(mId);
+            try {
+                NetworkUtils.fetchReviews(reviewsUrl, mCurrentMovie);
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
             return null;
         }
     }
@@ -48,10 +74,12 @@ public class FetchTask extends AsyncTask<String, Void, List<Movie>> {
         Log.v(LOG_TAG, "onPostExecute Called!");
         super.onPostExecute(movies);
 
-        mContext.mProgressBar.setVisibility(View.INVISIBLE);
-        mRecyclerAdapter = new MovieRecyclerAdapter(mContext, movies);
-        mContext.mRecyclerView.setAdapter(mRecyclerAdapter);
-        mContext.mRecyclerView.setVisibility(View.VISIBLE);
+        if(mContext!=null && mRecyclerAdapter!=null) {
+            mContext.mProgressBar.setVisibility(View.INVISIBLE);
+            mRecyclerAdapter = new MovieRecyclerAdapter(mContext, movies);
+            mContext.mRecyclerView.setAdapter(mRecyclerAdapter);
+            mContext.mRecyclerView.setVisibility(View.VISIBLE);
+        }
 
 
     }

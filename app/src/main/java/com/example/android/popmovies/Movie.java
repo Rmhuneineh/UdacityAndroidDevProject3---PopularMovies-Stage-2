@@ -1,6 +1,6 @@
 package com.example.android.popmovies;
 
-import android.util.Log;
+import java.util.ArrayList;
 
 /**
  * Created by rmhuneineh on 07/03/2018.
@@ -17,6 +17,9 @@ public class Movie {
     double mVoteAverage;
     String mOverview;
     String mBackdropPath;
+    String mYoutubeKey;
+    ArrayList<String> mAuthors = new ArrayList<>();
+    ArrayList<String> mContents = new ArrayList<>();
 
     public Movie(String id, String title, String releaseDate, String posterPath, double voteAverage,
                  String overview, String backdropPath) {
@@ -27,8 +30,6 @@ public class Movie {
         mVoteAverage = voteAverage;
         mOverview = overview;
         mBackdropPath = backdropPath;
-
-        Log.v(LOG_TAG, mTitle + "\n" + mReleaseDate + "\n" + mVoteAverage + "\n" + mOverview);
     }
 
     // Getters
@@ -60,6 +61,18 @@ public class Movie {
         return mBackdropPath;
     }
 
+    public String getYoutubeKey() {
+        return mYoutubeKey;
+    }
+
+    public ArrayList<String> getAuthors() {
+        return mAuthors;
+    }
+
+    public ArrayList<String> getContents() {
+        return mContents;
+    }
+
     // Setters
     public void setId(String id) {
         mId = id;
@@ -87,5 +100,18 @@ public class Movie {
 
     public void setBackdropPath(String backdropPath) {
         mBackdropPath = backdropPath;
+    }
+
+    public void setYoutubeKey(String key) {
+        mYoutubeKey = key;
+    }
+
+
+    public void setAuthors(ArrayList<String> authors) {
+        mAuthors = authors;
+    }
+
+    public void setContents(ArrayList<String> contents) {
+        mContents = contents;
     }
 }

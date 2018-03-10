@@ -1,14 +1,20 @@
 package com.example.android.popmovies;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -19,14 +25,20 @@ public class DetailsActivity extends AppCompatActivity {
     private static final String LOG_TAG = "DetailsActivity";
 
     private static final String base_path = "https://image.tmdb.org/t/p/w342";
-
+    private static final String YOUTUBE_BASE_PATH = "https://www.youtube.com/watch?v=";
+    private static final String ID_KEY = "id_key";
     private static final String TITLE_KEY = "title_key";
     private static final String RELEASE_DATE_KEY = "realease_date_key";
+    private static final String POSTER_KEY = "poster_key";
     private static final String VOTE_AVERAGE_KEY = "vote_average_key";
     private static final String OVERVIEW_KEY = "overview_key";
     private static final String BACKDROP_PATH_KEY = "backdrop_path_key";
 
     private Boolean favorite = false;
+    private Movie currentMovie;
+
+    @BindView(R.id.details_scroll_view)
+    ScrollView scrollView;
 
     @BindView(R.id.backdrop)
     ImageView backdropIV;
@@ -49,6 +61,13 @@ public class DetailsActivity extends AppCompatActivity {
     @BindView(R.id.reviews_frame)
     FrameLayout reviewsFrameLayout;
 
+    @BindView(R.id.reviews_recycler_view)
+    RecyclerView reviewRecyclerView;
+
+    ReviewRecyclerAdapter reviewRecyclerAdapter;
+
+    Boolean hiddenRecyclerView = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,11 +75,58 @@ public class DetailsActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
+        reviewRecyclerView.setVisibility(View.GONE);
+
+
         Intent intent = getIntent();
-        Bundle bundle = intent.getExtras();
+        final Bundle bundle = intent.getExtras();
         setUI(bundle);
 
+        extractBundle(bundle);
 
+        FetchTask videoAndReviewsTask = new FetchTask(currentMovie);
+        videoAndReviewsTask.execute("videos", "reviews");
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        reviewRecyclerView.setLayoutManager(linearLayoutManager);
+        reviewRecyclerView.setHasFixedSize(true);
+        reviewRecyclerAdapter = new ReviewRecyclerAdapter(this, currentMovie);
+        reviewRecyclerView.setAdapter(reviewRecyclerAdapter);
+
+        trailerFrameLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(YOUTUBE_BASE_PATH + currentMovie.getYoutubeKey()));
+                startActivity(intent);
+            }
+        });
+
+        reviewsFrameLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(currentMovie.getAuthors().size() != 0){
+                    if(!hiddenRecyclerView) {
+                        reviewRecyclerView.setVisibility(View.GONE);
+                        hiddenRecyclerView = true;
+                    } else {
+                        reviewRecyclerView.setVisibility(View.VISIBLE);
+                        hiddenRecyclerView = false;
+                    }
+                } else {
+                    Toast.makeText(DetailsActivity.this,
+                            "Movie Doesn't Have Reviews =(", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+    }
+
+    public void extractBundle(Bundle bundle) {
+        currentMovie = new Movie(bundle.getString(ID_KEY), bundle.getString(TITLE_KEY),
+                bundle.getString(RELEASE_DATE_KEY), bundle.getString(POSTER_KEY),
+                bundle.getDouble(VOTE_AVERAGE_KEY), bundle.getString(OVERVIEW_KEY),
+                bundle.getString(BACKDROP_PATH_KEY));
     }
 
     public void setUI(Bundle bundle) {

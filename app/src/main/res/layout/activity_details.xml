@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/details_scroll_view"
     tools:context="com.example.android.popmovies.DetailsActivity">
 
     <LinearLayout
@@ -162,6 +163,13 @@
                     android:src="@drawable/reviews_button"/>
             </RelativeLayout>
         </FrameLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/reviews_recycler_view">
+
+        </android.support.v7.widget.RecyclerView>
 
     </LinearLayout>
 
