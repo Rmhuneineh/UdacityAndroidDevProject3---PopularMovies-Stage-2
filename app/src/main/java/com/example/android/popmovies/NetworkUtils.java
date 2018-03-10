@@ -29,6 +29,7 @@ public class NetworkUtils {
     private static final String MOVIE_PATH = "movie";
     private static final String API_KEY_PARAM = "api_key";
     private static final String RESULTS = "results";
+    private static final String ID = "id";
     private static final String POSTER_PATH = "poster_path";
     private static final String BACKDROP_PATH = "backdrop_path";
     private static final String TITLE = "title";
@@ -111,6 +112,7 @@ public class NetworkUtils {
             Log.v("NetworkUtils", "Array Size: " + results.length());
             for (int i = 0; i < results.length(); i++) {
                 JSONObject movieObject = results.getJSONObject(i);
+                String movieId = movieObject.getString(ID);
                 String movieTitle = movieObject.getString(TITLE);
                 String posterPath = movieObject.getString(POSTER_PATH);
                 String backdropPath = movieObject.getString(BACKDROP_PATH);
@@ -118,7 +120,7 @@ public class NetworkUtils {
                 double rating = movieObject.getDouble(VOTE_AVERAGE);
                 String releaseDate = movieObject.getString(RELEASE_DATE);
 
-                Movie movie = new Movie(movieTitle, releaseDate, posterPath, rating, plotSynopsis,
+                Movie movie = new Movie(movieId, movieTitle, releaseDate, posterPath, rating, plotSynopsis,
                         backdropPath);
                 movies.add(movie);
 

@@ -10,6 +10,7 @@ public class Movie {
 
     private static final String LOG_TAG = "Movie";
 
+    String mId;
     String mTitle;
     String mReleaseDate;
     String mPosterPath;
@@ -17,8 +18,9 @@ public class Movie {
     String mOverview;
     String mBackdropPath;
 
-    public Movie(String title, String releaseDate, String posterPath, double voteAverage,
+    public Movie(String id, String title, String releaseDate, String posterPath, double voteAverage,
                  String overview, String backdropPath) {
+        mId = id;
         mTitle = title;
         mReleaseDate = releaseDate;
         mPosterPath = posterPath;
@@ -30,6 +32,10 @@ public class Movie {
     }
 
     // Getters
+    public String getId() {
+        return mId;
+    }
+
     public String getTitle() {
         return mTitle;
     }
@@ -55,6 +61,10 @@ public class Movie {
     }
 
     // Setters
+    public void setId(String id) {
+        mId = id;
+    }
+
     public void setTitle(String title) {
         mTitle = title;
     }
