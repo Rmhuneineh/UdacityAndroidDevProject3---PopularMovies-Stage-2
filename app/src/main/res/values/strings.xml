@@ -10,6 +10,8 @@
     <string name="ten">/10</string>
     <string name="rating">Rating</string>
     <string name="overview">Overview</string>
+    <string name="trailer">Trailer</string>
+    <string name="reviews">Reviews</string>
 
     <!-- Settings -->
     <string name="default_value">popular</string>
@@ -19,4 +21,6 @@
 
     <!-- APIKEY -->
     <string name="api_key">1b8d584a2753ce32f45181eb98e06bc9</string>
+
+    <string name="favorite_title">Favorite</string>
 </resources>

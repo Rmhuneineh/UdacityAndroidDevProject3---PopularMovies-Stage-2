@@ -3,6 +3,10 @@ package com.example.android.popmovies;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -22,6 +26,8 @@ public class DetailsActivity extends AppCompatActivity {
     private static final String OVERVIEW_KEY = "overview_key";
     private static final String BACKDROP_PATH_KEY = "backdrop_path_key";
 
+    private Boolean favorite = false;
+
     @BindView(R.id.backdrop)
     ImageView backdropIV;
 
@@ -36,6 +42,12 @@ public class DetailsActivity extends AppCompatActivity {
 
     @BindView(R.id.overview_tv)
     TextView overviewTV;
+
+    @BindView(R.id.trailer_frame)
+    FrameLayout trailerFrameLayout;
+
+    @BindView(R.id.reviews_frame)
+    FrameLayout reviewsFrameLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,5 +73,36 @@ public class DetailsActivity extends AppCompatActivity {
         releaseDateTV.setText(bundle.getString(RELEASE_DATE_KEY));
         ratingTV.setText(String.valueOf(bundle.getDouble(VOTE_AVERAGE_KEY)));
         overviewTV.setText(bundle.getString(OVERVIEW_KEY));
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        Log.v(LOG_TAG, "onCreateOptionsMenu Called!");
+        getMenuInflater().inflate(R.menu.details_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Log.v(LOG_TAG, "onOptionsItemSelected Called!");
+        int id = item.getItemId();
+
+        switch(id){
+            case R.id.action_favorite:
+                if(favorite) {
+                    item.setIcon(R.drawable.unfavorite);
+                    favorite = false;
+                } else {
+                    item.setIcon(R.drawable.favorite);
+                    favorite = true;
+            }
+
+                return true;
+
+            default:
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }
