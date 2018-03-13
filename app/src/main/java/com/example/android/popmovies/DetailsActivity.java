@@ -12,9 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -37,9 +35,6 @@ public class DetailsActivity extends AppCompatActivity {
     private Boolean favorite = false;
     private Movie currentMovie;
 
-    @BindView(R.id.details_scroll_view)
-    ScrollView scrollView;
-
     @BindView(R.id.backdrop)
     ImageView backdropIV;
 
@@ -58,15 +53,10 @@ public class DetailsActivity extends AppCompatActivity {
     @BindView(R.id.trailer_frame)
     FrameLayout trailerFrameLayout;
 
-    @BindView(R.id.reviews_frame)
-    FrameLayout reviewsFrameLayout;
-
     @BindView(R.id.reviews_recycler_view)
     RecyclerView reviewRecyclerView;
 
     ReviewRecyclerAdapter reviewRecyclerAdapter;
-
-    Boolean hiddenRecyclerView = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,8 +64,6 @@ public class DetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_details);
 
         ButterKnife.bind(this);
-
-        reviewRecyclerView.setVisibility(View.GONE);
 
 
         Intent intent = getIntent();
@@ -93,30 +81,13 @@ public class DetailsActivity extends AppCompatActivity {
         reviewRecyclerAdapter = new ReviewRecyclerAdapter(this, currentMovie);
         reviewRecyclerView.setAdapter(reviewRecyclerAdapter);
 
+
         trailerFrameLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setData(Uri.parse(YOUTUBE_BASE_PATH + currentMovie.getYoutubeKey()));
                 startActivity(intent);
-            }
-        });
-
-        reviewsFrameLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(currentMovie.getAuthors().size() != 0){
-                    if(!hiddenRecyclerView) {
-                        reviewRecyclerView.setVisibility(View.GONE);
-                        hiddenRecyclerView = true;
-                    } else {
-                        reviewRecyclerView.setVisibility(View.VISIBLE);
-                        hiddenRecyclerView = false;
-                    }
-                } else {
-                    Toast.makeText(DetailsActivity.this,
-                            "Movie Doesn't Have Reviews =(", Toast.LENGTH_SHORT).show();
-                }
             }
         });
 
