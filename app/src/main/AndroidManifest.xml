@@ -33,7 +33,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-        <activity android:name=".WebActivity"></activity>
+        
+        <provider
+            android:authorities="com.example.android.popmovies"
+            android:name=".FavoritesProvider"
+            android:exported="false"/>
     </application>
 
 </manifest>
