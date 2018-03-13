@@ -42,15 +42,15 @@ public class ReviewRecyclerAdapter extends RecyclerView.Adapter<ReviewRecyclerAd
 
     @Override
     public void onBindViewHolder(ReviewRecyclerAdapter.ViewHolder holder, int position) {
-        String review = mChosenMovie.getContents().get(position);
-        String author = mChosenMovie.getAuthors().get(position);
+            String review = mChosenMovie.getContents().get(position);
+            String author = mChosenMovie.getAuthors().get(position);
 
-        holder.contentTV.setText(review);
-        holder.authorTV.setText(author);
+            holder.contentTV.setText(review);
+            holder.authorTV.setText(author);
     }
 
     @Override
     public int getItemCount() {
-        return  mChosenMovie.getAuthors().size();
+        return  mChosenMovie.getContents().size();
     }
 }
