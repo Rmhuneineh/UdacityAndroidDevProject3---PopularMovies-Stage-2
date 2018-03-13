@@ -29,7 +29,6 @@ public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdap
     private static final String VOTE_AVERAGE_KEY = "vote_average_key";
     private static final String OVERVIEW_KEY = "overview_key";
     private static final String BACKDROP_PATH_KEY = "backdrop_path_key";
-    private static final String YOUTUBE_KEY_KEY = "youtube_key";
 
 
 
