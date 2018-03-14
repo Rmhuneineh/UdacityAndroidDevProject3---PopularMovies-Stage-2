@@ -28,7 +28,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity implements
-        LoaderManager.LoaderCallbacks<Cursor> {
+        LoaderManager.LoaderCallbacks<Cursor>, SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String LOG_TAG = "MainActivity";
 
@@ -57,6 +57,9 @@ public class MainActivity extends AppCompatActivity implements
 
         Log.v(LOG_TAG, "OnCreate Called!");
 
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .registerOnSharedPreferenceChangeListener(this);
+
         ButterKnife.bind(this);
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this,
@@ -64,6 +67,10 @@ public class MainActivity extends AppCompatActivity implements
         mRecyclerView.setLayoutManager(gridLayoutManager);
         mRecyclerView.setHasFixedSize(true);
 
+        loadMovies();
+    }
+
+    private void loadMovies() {
         SharedPreferences sharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(this);
 
@@ -76,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements
             case "top_rated":
                 mRecyclerAdapter = new MovieRecyclerAdapter(this, mMoviesList);
                 mRecyclerView.setAdapter(mRecyclerAdapter);
+                emptyView.setVisibility(View.GONE);
 
                 if(hasConnection()) {
                     mRecyclerView.setVisibility(View.GONE);
@@ -109,7 +117,8 @@ public class MainActivity extends AppCompatActivity implements
                 FavoritesContract.FavoritesEntry.COLUMN_MOVIE_POSTER,
                 FavoritesContract.FavoritesEntry.COLUMN_MOVIE_RATING,
                 FavoritesContract.FavoritesEntry.COLUMN_MOVIE_OVERVIEW,
-                FavoritesContract.FavoritesEntry.COLUMN_MOVIE_BACKDROP};
+                FavoritesContract.FavoritesEntry.COLUMN_MOVIE_BACKDROP,
+                FavoritesContract.FavoritesEntry.COLUMN_MOVIE_FAVORITE};
 
         return new CursorLoader(this,
                 FavoritesContract.FavoritesEntry.CONTENT_URI,
@@ -168,5 +177,28 @@ public class MainActivity extends AppCompatActivity implements
                 activeNetwork.isConnectedOrConnecting();
 
         return isConnected;
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        loadMovies();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        loadMovies();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .unregisterOnSharedPreferenceChangeListener(this);
     }
 }

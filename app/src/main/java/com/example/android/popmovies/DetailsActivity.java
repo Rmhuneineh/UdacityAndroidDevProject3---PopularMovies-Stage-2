@@ -1,8 +1,15 @@
 package com.example.android.popmovies;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,14 +20,21 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class DetailsActivity extends AppCompatActivity {
+public class DetailsActivity extends AppCompatActivity implements
+        LoaderManager.LoaderCallbacks<Cursor> {
+
     private static final String LOG_TAG = "DetailsActivity";
+
+    static final int EXISTING_FAVORITES_LOADER = 0;
+
+    private static final String uri_key = "content_uri";
 
     private static final String base_path = "https://image.tmdb.org/t/p/w342";
     private static final String YOUTUBE_BASE_PATH = "https://www.youtube.com/watch?v=";
@@ -34,6 +48,7 @@ public class DetailsActivity extends AppCompatActivity {
 
     private Boolean favorite = false;
     private Movie currentMovie;
+    private String mCurrentFavoriteUri = null;
 
     @BindView(R.id.backdrop)
     ImageView backdropIV;
@@ -57,29 +72,33 @@ public class DetailsActivity extends AppCompatActivity {
     RecyclerView reviewRecyclerView;
 
     ReviewRecyclerAdapter reviewRecyclerAdapter;
+    Bundle bundle = new Bundle();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
 
+        Log.v(LOG_TAG, "onCreate Called!");
+
         ButterKnife.bind(this);
 
 
         Intent intent = getIntent();
-        final Bundle bundle = intent.getExtras();
-        setUI(bundle);
+        if(intent.hasExtra(uri_key)) {
+            mCurrentFavoriteUri = intent.getStringExtra(uri_key);
+            getSupportLoaderManager().initLoader(EXISTING_FAVORITES_LOADER, null, this);
+        } else {
+            bundle = intent.getExtras();
+            extractBundle(bundle);
 
-        extractBundle(bundle);
-
-        FetchTask videoAndReviewsTask = new FetchTask(currentMovie);
-        videoAndReviewsTask.execute("videos", "reviews");
-
+            FetchTask videoAndReviewsTask = new FetchTask(this, currentMovie);
+            videoAndReviewsTask.execute("videos", "reviews");
+        }
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         reviewRecyclerView.setLayoutManager(linearLayoutManager);
         reviewRecyclerView.setHasFixedSize(true);
-        reviewRecyclerAdapter = new ReviewRecyclerAdapter(this, currentMovie);
-        reviewRecyclerView.setAdapter(reviewRecyclerAdapter);
+
 
 
         trailerFrameLayout.setOnClickListener(new View.OnClickListener() {
@@ -93,29 +112,149 @@ public class DetailsActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Log.v(LOG_TAG, "onCreateLoader Called!");
+        String[] projection = {
+                FavoritesContract.FavoritesEntry._ID,
+                FavoritesContract.FavoritesEntry.COLUMN_MOVIE_ID,
+                FavoritesContract.FavoritesEntry.COLUMN_MOVIE_TITLE,
+                FavoritesContract.FavoritesEntry.COLUMN_MOVIE_DATE,
+                FavoritesContract.FavoritesEntry.COLUMN_MOVIE_POSTER,
+                FavoritesContract.FavoritesEntry.COLUMN_MOVIE_RATING,
+                FavoritesContract.FavoritesEntry.COLUMN_MOVIE_OVERVIEW,
+                FavoritesContract.FavoritesEntry.COLUMN_MOVIE_BACKDROP,
+                FavoritesContract.FavoritesEntry.COLUMN_MOVIE_FAVORITE};
+
+        if (args == null) {
+            return new CursorLoader(this,
+                    Uri.parse(mCurrentFavoriteUri),
+                    projection,
+                    null,
+                    null,
+                    null);
+        } else {
+            Log.v(LOG_TAG, "args != null!");
+            return new CursorLoader(this,
+                    FavoritesContract.FavoritesEntry.CONTENT_URI,
+                    projection,
+                    null,
+                    null,
+                    null);
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        Log.v(LOG_TAG, "onLoadFinished Called!");
+        if (cursor == null || cursor.getCount() < 1) {
+            favorite = false;
+        }
+
+        // Proceed with moving to the first row of the cursor and reading data from it
+        // (This should be the only row in the cursor)
+        else if (mCurrentFavoriteUri != null) {
+            // Find the columns of product attributes that we're interested in
+            cursor.moveToLast();
+            int idCI = cursor.getColumnIndex(FavoritesContract.FavoritesEntry.COLUMN_MOVIE_ID);
+            int titleCI = cursor.getColumnIndex(FavoritesContract.FavoritesEntry.COLUMN_MOVIE_TITLE);
+            int dateCI = cursor.getColumnIndex(FavoritesContract.FavoritesEntry.COLUMN_MOVIE_DATE);
+            int posterCI = cursor.getColumnIndex(FavoritesContract.FavoritesEntry.COLUMN_MOVIE_POSTER);
+            int ratingCI = cursor.getColumnIndex(FavoritesContract.FavoritesEntry.COLUMN_MOVIE_RATING);
+            int overviewCI = cursor.getColumnIndex(FavoritesContract.FavoritesEntry.COLUMN_MOVIE_OVERVIEW);
+            int backdropCI = cursor.getColumnIndex(FavoritesContract.FavoritesEntry.COLUMN_MOVIE_BACKDROP);
+            int isFavCI = cursor.getColumnIndex(FavoritesContract.FavoritesEntry.COLUMN_MOVIE_FAVORITE);
+            // Extract out the value from the Cursor for the given column index
+            String id = cursor.getString(idCI);
+            String title = cursor.getString(titleCI);
+            String date = cursor.getString(dateCI);
+            String poster = cursor.getString(posterCI);
+            String rating = cursor.getString(ratingCI);
+            String overview = cursor.getString(overviewCI);
+            String backdrop = cursor.getString(backdropCI);
+            int isFav = cursor.getInt(isFavCI);
+
+            currentMovie = new Movie(id, title, date, poster, Double.valueOf(rating),
+                    overview, backdrop);
+
+            if (isFav == 1) {
+                favorite = true;
+                currentMovie.setIsFav(favorite);
+
+            } else {
+                favorite = false;
+                currentMovie.setIsFav(favorite);
+            }
+
+
+            FetchTask videoAndReviewsTask = new FetchTask(this, currentMovie);
+            videoAndReviewsTask.execute("videos", "reviews");
+        } else {
+            boolean found = false;
+            Log.v(LOG_TAG, String.valueOf(cursor.getCount()));
+            for(int i=0; i<cursor.getCount(); i++) {
+                cursor.moveToPosition(i);
+                if(currentMovie.getId().equals(cursor.getString(cursor.getColumnIndex(FavoritesContract.
+                        FavoritesEntry.COLUMN_MOVIE_ID)))) {
+                    found = true;
+                    mCurrentFavoriteUri = String.valueOf(cursor.getNotificationUri());
+                }
+            }
+            favorite = found;
+        }
+        invalidateOptionsMenu();
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        Log.v(LOG_TAG, "onLoaderReset Called!");
+    }
+
     public void extractBundle(Bundle bundle) {
+        Log.v(LOG_TAG, "extractBundle Called!");
         currentMovie = new Movie(bundle.getString(ID_KEY), bundle.getString(TITLE_KEY),
                 bundle.getString(RELEASE_DATE_KEY), bundle.getString(POSTER_KEY),
                 bundle.getDouble(VOTE_AVERAGE_KEY), bundle.getString(OVERVIEW_KEY),
                 bundle.getString(BACKDROP_PATH_KEY));
     }
 
-    public void setUI(Bundle bundle) {
+    public void setUI() {
+        Log.v(LOG_TAG, "setUI Called!");
         Picasso.with(this)
-                .load(base_path + bundle.getString(BACKDROP_PATH_KEY))
+                .load(base_path + currentMovie.getPosterPath())
                 .placeholder(R.drawable.fight_club_backdrop)
                 .into(backdropIV);
 
-        titleTV.setText(bundle.getString(TITLE_KEY));
-        releaseDateTV.setText(bundle.getString(RELEASE_DATE_KEY));
-        ratingTV.setText(String.valueOf(bundle.getDouble(VOTE_AVERAGE_KEY)));
-        overviewTV.setText(bundle.getString(OVERVIEW_KEY));
+        titleTV.setText(currentMovie.getTitle());
+        releaseDateTV.setText(currentMovie.getReleaseDate());
+        ratingTV.setText(String.valueOf(currentMovie.getVoteAverage()));
+        overviewTV.setText(currentMovie.getOverview());
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         Log.v(LOG_TAG, "onCreateOptionsMenu Called!");
+
         getMenuInflater().inflate(R.menu.details_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        Log.v(LOG_TAG, "onPrepareOptionsMenu Called!");
+
+        super.onPrepareOptionsMenu(menu);
+        if (favorite) {
+            menu.findItem(R.id.action_favorite).setIcon(R.drawable.favorite);
+        } else {
+            menu.findItem(R.id.action_favorite).setIcon(R.drawable.unfavorite);
+        }
         return true;
     }
 
@@ -129,11 +268,14 @@ public class DetailsActivity extends AppCompatActivity {
                 if(favorite) {
                     item.setIcon(R.drawable.unfavorite);
                     favorite = false;
+                    unfavMovie();
+
                 } else {
                     item.setIcon(R.drawable.favorite);
                     favorite = true;
+                    favMovie();
             }
-
+                currentMovie.setIsFav(favorite);
                 return true;
 
             default:
@@ -141,5 +283,51 @@ public class DetailsActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void favMovie() {
+        Log.v(LOG_TAG, "favMovie Called!");
+
+        ContentValues values = new ContentValues();
+        values.put(FavoritesContract.FavoritesEntry.COLUMN_MOVIE_ID, currentMovie.getId());
+        values.put(FavoritesContract.FavoritesEntry.COLUMN_MOVIE_TITLE, currentMovie.getTitle());
+        values.put(FavoritesContract.FavoritesEntry.COLUMN_MOVIE_DATE, currentMovie.getReleaseDate());
+        values.put(FavoritesContract.FavoritesEntry.COLUMN_MOVIE_POSTER, currentMovie.getPosterPath());
+        values.put(FavoritesContract.FavoritesEntry.COLUMN_MOVIE_RATING, String.valueOf(currentMovie.getVoteAverage()));
+        values.put(FavoritesContract.FavoritesEntry.COLUMN_MOVIE_OVERVIEW, currentMovie.getOverview());
+        values.put(FavoritesContract.FavoritesEntry.COLUMN_MOVIE_BACKDROP, currentMovie.getBackdropPath());
+        values.put(FavoritesContract.FavoritesEntry.COLUMN_MOVIE_FAVORITE, 1);
+
+
+        mCurrentFavoriteUri = String.valueOf(getContentResolver()
+                .insert(FavoritesContract.FavoritesEntry.CONTENT_URI, values));
+        if (mCurrentFavoriteUri == null) {
+            // If the new content URI is null, then there was an error with insertion.
+            Toast.makeText(this, "Error Saving!",
+                    Toast.LENGTH_SHORT).show();
+        } else {
+            // Otherwise, the insertion was successful and we can display a toast.
+            Toast.makeText(this, "Saved to Favorites!",
+                    Toast.LENGTH_SHORT).show();
+            currentMovie.setIsFav(true);
+        }
+        Log.v(LOG_TAG, "favMovie Done!");
+    }
+
+    private void unfavMovie() {
+        Log.v(LOG_TAG, "unfavMovie Called!");
+
+        int rowsDeleted = getContentResolver().delete(Uri.parse(mCurrentFavoriteUri), null, null);
+        if (rowsDeleted == 0) {
+            // If no rows were deleted, then there was an error with the delete.
+            Toast.makeText(this, "Failed to Unfavorite",
+                    Toast.LENGTH_SHORT).show();
+        } else {
+            // Otherwise, the delete was successful and we can display a toast.
+            Toast.makeText(this, "Removed From Favorites Successfully",
+                    Toast.LENGTH_SHORT).show();
+            currentMovie.setIsFav(false);
+            mCurrentFavoriteUri = null;
+        }
     }
 }

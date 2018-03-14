@@ -25,6 +25,7 @@ public class FavoritesContract {
         public static final String COLUMN_MOVIE_RATING = "voteAverage";
         public static final String COLUMN_MOVIE_OVERVIEW = "overview";
         public static final String COLUMN_MOVIE_BACKDROP = "backdropPath";
+        public static final String COLUMN_MOVIE_FAVORITE = "favorite";
 
         public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_FAVORITES);
 

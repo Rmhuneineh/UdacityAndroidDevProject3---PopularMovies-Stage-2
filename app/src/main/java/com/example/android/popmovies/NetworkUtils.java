@@ -186,7 +186,6 @@ public class NetworkUtils {
                    JSONObject review = results.getJSONObject(i);
                    authors.add(review.getString(AUTHOR));
                    contents.add(review.getString(CONTENT));
-                   Log.v(LOG_TAG, contents.get(i) + "\n" + authors.get(i));
                 }
 
             } else {
@@ -213,7 +212,6 @@ public class NetworkUtils {
             JSONArray results = baseJsonResponse.getJSONArray(RESULTS);
             JSONObject item = results.getJSONObject(0);
             youtubeKey = item.getString(KEY);
-            Log.v(LOG_TAG, youtubeKey);
         } catch (JSONException e) {
             e.printStackTrace();
         }

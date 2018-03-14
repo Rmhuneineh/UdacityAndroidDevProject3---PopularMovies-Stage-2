@@ -1,7 +1,9 @@
 package com.example.android.popmovies;
 
+import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,8 +20,7 @@ public class MovieCursorAdapter extends CursorRecyclerAdapter<MovieCursorAdapter
 
     private static final String base_path = "https://image.tmdb.org/t/p/w342";
 
-    private static final String data_key = "data";
-    private static final String DATA = "DATA";
+    private static final String uri_key = "content_uri";
 
     private MainActivity activity = new MainActivity();
 
@@ -49,6 +50,7 @@ public class MovieCursorAdapter extends CursorRecyclerAdapter<MovieCursorAdapter
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, Cursor cursor) {
+        final long id = cursor.getLong(cursor.getColumnIndex(FavoritesContract.FavoritesEntry._ID));
         int posterColumnIndex = cursor.getColumnIndex(FavoritesContract.FavoritesEntry.
                 COLUMN_MOVIE_POSTER);
 
@@ -63,7 +65,9 @@ public class MovieCursorAdapter extends CursorRecyclerAdapter<MovieCursorAdapter
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(view.getContext(), DetailsActivity.class);
-                intent.putExtra(data_key, DATA);
+                Uri currentFavoriteUri = ContentUris.withAppendedId(FavoritesContract
+                        .FavoritesEntry.CONTENT_URI, id);
+                intent.putExtra(uri_key, currentFavoriteUri.toString());
                 activity.startActivity(intent);
             }
         });

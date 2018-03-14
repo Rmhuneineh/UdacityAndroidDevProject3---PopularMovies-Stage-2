@@ -15,6 +15,7 @@ public class FetchTask extends AsyncTask<String, Void, List<Movie>> {
     private static final String LOG_TAG = "FetchTask";
 
     private MainActivity mContext = null;
+    private DetailsActivity mActivity = null;
     private MovieRecyclerAdapter mRecyclerAdapter = null;
     private String mId;
     private Movie mCurrentMovie;
@@ -24,7 +25,8 @@ public class FetchTask extends AsyncTask<String, Void, List<Movie>> {
         mRecyclerAdapter = recyclerAdapter;
     }
 
-    public FetchTask(Movie currentMovie) {
+    public FetchTask(DetailsActivity activity, Movie currentMovie) {
+        mActivity = activity;
         mId = currentMovie.getId();
         mCurrentMovie = currentMovie;
     }
@@ -79,6 +81,12 @@ public class FetchTask extends AsyncTask<String, Void, List<Movie>> {
             mRecyclerAdapter = new MovieRecyclerAdapter(mContext, movies);
             mContext.mRecyclerView.setAdapter(mRecyclerAdapter);
             mContext.mRecyclerView.setVisibility(View.VISIBLE);
+        } else {
+            mActivity.reviewRecyclerAdapter = new ReviewRecyclerAdapter(mActivity, mCurrentMovie);
+            mActivity.reviewRecyclerView.setAdapter(mActivity.reviewRecyclerAdapter);
+            mActivity.setUI();
+            mActivity.getSupportLoaderManager().initLoader(mActivity.EXISTING_FAVORITES_LOADER,
+                    mActivity.bundle, mActivity);
         }
 
 

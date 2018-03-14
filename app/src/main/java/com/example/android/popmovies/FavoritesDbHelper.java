@@ -28,7 +28,8 @@ public class FavoritesDbHelper extends SQLiteOpenHelper {
                 FavoritesContract.FavoritesEntry.COLUMN_MOVIE_POSTER + " TEXT," +
                 FavoritesContract.FavoritesEntry.COLUMN_MOVIE_RATING + " TEXT, " +
                 FavoritesContract.FavoritesEntry.COLUMN_MOVIE_OVERVIEW + " TEXT, " +
-                FavoritesContract.FavoritesEntry.COLUMN_MOVIE_BACKDROP + " TEXT);";
+                FavoritesContract.FavoritesEntry.COLUMN_MOVIE_BACKDROP + " TEXT, " +
+                FavoritesContract.FavoritesEntry.COLUMN_MOVIE_FAVORITE + " INTEGER NOT NULL);";
 
         db.execSQL(SQL_CREATE_ENTRIES);
     }

@@ -20,6 +20,7 @@ public class Movie {
     String mYoutubeKey;
     ArrayList<String> mAuthors = new ArrayList<>();
     ArrayList<String> mContents = new ArrayList<>();
+    boolean isFav = false;
 
     public Movie(String id, String title, String releaseDate, String posterPath, double voteAverage,
                  String overview, String backdropPath) {
@@ -73,6 +74,10 @@ public class Movie {
         return mContents;
     }
 
+    public boolean getIsFav() {
+        return isFav;
+    }
+
     // Setters
     public void setId(String id) {
         mId = id;
@@ -113,5 +118,9 @@ public class Movie {
 
     public void setContents(ArrayList<String> contents) {
         mContents = contents;
+    }
+
+    public void setIsFav(boolean fav) {
+        isFav = fav;
     }
 }
