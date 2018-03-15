@@ -21,6 +21,7 @@ public class MovieCursorAdapter extends CursorRecyclerAdapter<MovieCursorAdapter
     private static final String base_path = "https://image.tmdb.org/t/p/w342";
 
     private static final String uri_key = "content_uri";
+    private static final String favorites_key = "favorites";
 
     private MainActivity activity = new MainActivity();
 
@@ -68,6 +69,9 @@ public class MovieCursorAdapter extends CursorRecyclerAdapter<MovieCursorAdapter
                 Uri currentFavoriteUri = ContentUris.withAppendedId(FavoritesContract
                         .FavoritesEntry.CONTENT_URI, id);
                 intent.putExtra(uri_key, currentFavoriteUri.toString());
+                if (activity.getSortOrder().equals(activity.getString(R.string.favorites))) {
+                    intent.putExtra(favorites_key, activity.getSortOrder());
+                }
                 activity.startActivity(intent);
             }
         });

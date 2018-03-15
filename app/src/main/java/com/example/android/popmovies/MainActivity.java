@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements
 
     ArrayList<Movie> mMoviesList = new ArrayList<Movie>();
     MovieRecyclerAdapter mRecyclerAdapter;
+    private String mSortOrder;
     MovieCursorAdapter mMovieCursorAdapter;
 
     @Override
@@ -70,6 +71,14 @@ public class MainActivity extends AppCompatActivity implements
         loadMovies();
     }
 
+    private void setSortOrder(String order) {
+        mSortOrder = order;
+    }
+
+    public String getSortOrder() {
+        return mSortOrder;
+    }
+
     private void loadMovies() {
         SharedPreferences sharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(this);
@@ -77,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements
         String sortOrderKey = getString(R.string.key);
         String sortOrderDefault = getString(R.string.default_value);
         String sortOrder = sharedPreferences.getString(sortOrderKey, sortOrderDefault);
+        setSortOrder(sortOrder);
 
         switch (sortOrder) {
             case "popular":
@@ -187,7 +197,6 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onStart() {
         super.onStart();
-        loadMovies();
     }
 
     @Override

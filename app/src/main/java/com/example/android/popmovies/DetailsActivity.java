@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,6 +34,8 @@ public class DetailsActivity extends AppCompatActivity implements
     private static final String LOG_TAG = "DetailsActivity";
 
     static final int EXISTING_FAVORITES_LOADER = 0;
+
+    private static final String SAVED_STATE = "saved_state";
 
     private static final String uri_key = "content_uri";
 
@@ -49,6 +52,9 @@ public class DetailsActivity extends AppCompatActivity implements
     private Boolean favorite = false;
     private Movie currentMovie;
     private String mCurrentFavoriteUri = null;
+
+    @BindView(R.id.details_scroll_view)
+    ScrollView detailsSV;
 
     @BindView(R.id.backdrop)
     ImageView backdropIV;
@@ -74,6 +80,8 @@ public class DetailsActivity extends AppCompatActivity implements
     ReviewRecyclerAdapter reviewRecyclerAdapter;
     Bundle bundle = new Bundle();
 
+    Boolean favoritesDetails = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,24 +90,32 @@ public class DetailsActivity extends AppCompatActivity implements
         Log.v(LOG_TAG, "onCreate Called!");
 
         ButterKnife.bind(this);
-
-
         Intent intent = getIntent();
-        if(intent.hasExtra(uri_key)) {
-            mCurrentFavoriteUri = intent.getStringExtra(uri_key);
-            getSupportLoaderManager().initLoader(EXISTING_FAVORITES_LOADER, null, this);
-        } else {
-            bundle = intent.getExtras();
-            extractBundle(bundle);
 
-            FetchTask videoAndReviewsTask = new FetchTask(this, currentMovie);
-            videoAndReviewsTask.execute("videos", "reviews");
+        if(savedInstanceState == null) {
+            if(intent.hasExtra("favorites")) {
+                favoritesDetails = true;
+            }
+
+            if(intent.hasExtra(uri_key)) {
+                mCurrentFavoriteUri = intent.getStringExtra(uri_key);
+                getSupportLoaderManager().initLoader(EXISTING_FAVORITES_LOADER, null, this);
+            } else {
+                bundle = intent.getExtras();
+                extractBundle(bundle);
+
+                FetchTask videoAndReviewsTask = new FetchTask(this, currentMovie);
+                videoAndReviewsTask.execute("videos", "reviews");
+            }
+        } else {
+            if (savedInstanceState.containsKey(SAVED_STATE)) {
+                bundle = savedInstanceState.getBundle(SAVED_STATE);
+            }
         }
+
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         reviewRecyclerView.setLayoutManager(linearLayoutManager);
         reviewRecyclerView.setHasFixedSize(true);
-
-
 
         trailerFrameLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -110,6 +126,31 @@ public class DetailsActivity extends AppCompatActivity implements
             }
         });
 
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        Log.v(LOG_TAG, "onSaveInstanceState Called!");
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("favorite", favorite);
+        outState.putBundle(SAVED_STATE, bundle);
+        outState.putParcelable("adapter", reviewRecyclerAdapter);
+        outState.putString("uri", mCurrentFavoriteUri);
+        outState.putBoolean("favorites", favoritesDetails);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        Log.v(LOG_TAG, "onRestoreInstanceState Called!");
+        super.onRestoreInstanceState(savedInstanceState);
+        extractBundle(savedInstanceState.getBundle(SAVED_STATE));
+        setUI();
+        reviewRecyclerAdapter = savedInstanceState.getParcelable("adapter");
+        reviewRecyclerView.setAdapter(reviewRecyclerAdapter);
+        favorite = savedInstanceState.getBoolean("favorite");
+        mCurrentFavoriteUri = savedInstanceState.getString("uri");
+        favoritesDetails = savedInstanceState.getBoolean("favorites");
+        invalidateOptionsMenu();
     }
 
     @Override
@@ -177,6 +218,14 @@ public class DetailsActivity extends AppCompatActivity implements
 
             currentMovie = new Movie(id, title, date, poster, Double.valueOf(rating),
                     overview, backdrop);
+
+            bundle.putString(ID_KEY, currentMovie.getId());
+            bundle.putString(TITLE_KEY, currentMovie.getTitle());
+            bundle.putString(RELEASE_DATE_KEY, currentMovie.getReleaseDate());
+            bundle.putString(POSTER_KEY, currentMovie.getPosterPath());
+            bundle.putDouble(VOTE_AVERAGE_KEY, currentMovie.getVoteAverage());
+            bundle.putString(OVERVIEW_KEY, currentMovie.getOverview());
+            bundle.putString(BACKDROP_PATH_KEY, currentMovie.getBackdropPath());
 
             if (isFav == 1) {
                 favorite = true;
@@ -269,6 +318,9 @@ public class DetailsActivity extends AppCompatActivity implements
                     item.setIcon(R.drawable.unfavorite);
                     favorite = false;
                     unfavMovie();
+                    if(favoritesDetails) {
+                        finish();
+                    }
 
                 } else {
                     item.setIcon(R.drawable.favorite);
@@ -329,5 +381,23 @@ public class DetailsActivity extends AppCompatActivity implements
             currentMovie.setIsFav(false);
             mCurrentFavoriteUri = null;
         }
+    }
+
+    @Override
+    protected void onPause() {
+        Log.v(LOG_TAG, "onPause Called!");
+        super.onPause();
+
+    }
+
+    @Override
+    protected void onResume() {
+        Log.v(LOG_TAG, "onResume Called!");
+        super.onResume();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }

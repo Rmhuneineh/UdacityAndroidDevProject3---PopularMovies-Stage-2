@@ -88,8 +88,6 @@ public class FetchTask extends AsyncTask<String, Void, List<Movie>> {
             mActivity.getSupportLoaderManager().initLoader(mActivity.EXISTING_FAVORITES_LOADER,
                     mActivity.bundle, mActivity);
         }
-
-
     }
 
 }

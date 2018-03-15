@@ -1,6 +1,8 @@
 package com.example.android.popmovies;
 
 import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,13 +13,24 @@ import android.widget.TextView;
  * Created by rmhuneineh on 10/03/2018.
  */
 
-public class ReviewRecyclerAdapter extends RecyclerView.Adapter<ReviewRecyclerAdapter.ViewHolder> {
+public class ReviewRecyclerAdapter extends RecyclerView.Adapter<ReviewRecyclerAdapter.ViewHolder>
+implements Parcelable{
     Movie mChosenMovie;
     Context mContext;
 
     public ReviewRecyclerAdapter(Context context, Movie chosenMovie) {
         mChosenMovie = chosenMovie;
         mContext = context;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+
     }
 
     public  class ViewHolder extends RecyclerView.ViewHolder {
